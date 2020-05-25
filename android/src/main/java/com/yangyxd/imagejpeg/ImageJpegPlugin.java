@@ -13,6 +13,7 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,7 +74,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             if (targetPath == null || targetPath.length() == 0)
                 targetPath = srcPath + ".jpg";
 
-            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom,false);
+            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, false);
             if (newPath == null || newPath.length() == 0)
                 result.error("Encode Jpeg Failed", null, null);
             else
@@ -103,7 +104,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             if (targetPath == null || targetPath.length() == 0)
                 targetPath = srcPath + ".jpg";
 
-            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom,true);
+            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, true);
 
             if (newPath == null || newPath.length() == 0)
                 result.error("Encode Jpeg Failed", null, null);
@@ -217,40 +218,64 @@ public class ImageJpegPlugin implements MethodCallHandler {
         }
     }
 
-    public String compressImage(String filePath, String targetPath, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom,boolean isOneChip) {
+    public String compressImage(String filePath, String targetPath, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom, boolean isOneChip) {
         //Log.d("image_jpeg", String.format("srcfile: %s", filePath));
         //Log.d("image_jpeg", String.format("mw: %d, mh: %d, quality: %d, targetfile: %s", maxWidth, maxHeight, quality, targetPath));
-
         try {
             Bitmap bm = getSmallBitmap(filePath, maxWidth, maxHeight);
             //一寸照片处理
-            if(isOneChip){
-              bm = createScaledBitmap(bm,maxWidth,maxHeight,false);
+            if (isOneChip) {
+                bm = createScaledBitmap(bm, maxWidth, maxHeight, false);
             }
             // 旋转处理
             bm = rotateImage(bm, rotate);
             // 高斯模糊
             if (blur > 0) bm = blurImage(bm, blur, blurZoom);
-
             //Log.d("image_jpeg", String.format("nw: %d, nh: %d", bm.getWidth(), bm.getHeight()));
-
             File outputFile = getOutputFile(targetPath, true);
             if (outputFile == null) {
                 return null;
             }
             FileOutputStream out = new FileOutputStream(outputFile);
+            if (isOneChip) {
+                bm = compressImage(bm);
+            }
             bm.compress(Bitmap.CompressFormat.JPEG, quality, out);
-
             //Log.d("image_jpeg", String.format("targerSize: %d, outputfile: %s", out.getChannel().size(), outputFile.getPath()));
-
             out.close();
             return outputFile.getPath();
-
         } catch (Exception e) {
             Log.d("image_jpeg", e.getMessage());
             return null;
         }
     }
+
+    /**
+     * 质量压缩方法
+     *
+     * @param image
+     * @return
+     */
+    public static Bitmap compressImage(Bitmap image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // 质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        int options = 90;
+        // 循环判断如果压缩后图片是否大于25kb,大于继续压缩
+        while (baos.toByteArray().length / 1024 > 25) {
+            // 重置baos即清空baos
+            baos.reset();
+            // 这里压缩options%，把压缩后的数据存放到baos中
+            image.compress(Bitmap.CompressFormat.JPEG, options, baos);
+            options -= 10;// 每次都减少10
+        }
+        // 把压缩后的数据baos存放到ByteArrayInputStream中
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
+        // 把ByteArrayInputStream数据生成图片
+        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, null);
+        return bitmap;
+    }
+
 
     public byte[] compressBytesImage(byte[] buffer, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom) {
         try {
