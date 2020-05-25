@@ -22,6 +22,22 @@ class ImageJpeg {
     return result;
   }
 
+  /// encode JPEG
+  static Future<String> encodeOneChip(String srcPath, String targetPath, int quality, int maxWidth, int maxHeight, [int rotate = 0, int blur = 0, int blurZoom = 0]) async {
+    final Map<String, dynamic> params = <String, dynamic> {
+      'srcPath': srcPath,
+      'targetPath': targetPath,
+      'quality': quality,  // 0~100
+      'maxWidth': maxWidth, // default 5000
+      'maxHeight': maxHeight,  // default 5000
+      'rotate': rotate,
+      'blur': blur,
+      'blurZoom' : blurZoom,
+    };
+    final String result = await _channel.invokeMethod('encodeOneChip', params);
+    return result;
+  }
+
   /// encode Buffer JPEG
   static Future<List<int>> encodeJpegWithBuffer(List<int> image, int quality, int maxWidth, int maxHeight, [int rotate = 0, int blur = 0, int blurZoom = 0]) async {
     final result = await _channel.invokeMethod('encodeJpegWithBuffer', [
