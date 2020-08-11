@@ -219,8 +219,8 @@ public class ImageJpegPlugin implements MethodCallHandler {
     }
 
     public String compressImage(String filePath, String targetPath, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom, boolean isOneChip, int fileSize) {
-        //Log.d("image_jpeg", String.format("srcfile: %s", filePath));
-        //Log.d("image_jpeg", String.format("mw: %d, mh: %d, quality: %d, targetfile: %s", maxWidth, maxHeight, quality, targetPath));
+        Log.d("image_jpeg", String.format("srcfile: %s", filePath));
+        Log.d("image_jpeg", String.format("mw: %d, mh: %d, quality: %d, targetfile: %s", maxWidth, maxHeight, quality, targetPath));
         try {
             Bitmap bm = getSmallBitmap(filePath, maxWidth, maxHeight);
             //一寸照片处理
@@ -231,7 +231,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             bm = rotateImage(bm, rotate);
             // 高斯模糊
             if (blur > 0) bm = blurImage(bm, blur, blurZoom);
-            //Log.d("image_jpeg", String.format("nw: %d, nh: %d", bm.getWidth(), bm.getHeight()));
+            Log.d("image_jpeg", String.format("nw: %d, nh: %d", bm.getWidth(), bm.getHeight()));
             File outputFile = getOutputFile(targetPath, true);
             if (outputFile == null) {
                 return null;
@@ -258,6 +258,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
     public static Bitmap compressImage(Bitmap image, int size) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // 质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         int options = 90;
         // 循环判断如果压缩后图片是否大于size的大小单位是kb,大于继续压缩
         while (baos.toByteArray().length / 1024 > size) {
