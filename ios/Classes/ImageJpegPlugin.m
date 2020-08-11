@@ -20,6 +20,7 @@
     NSString *srotate = call.arguments[@"rotate"];
     NSString *sblur = call.arguments[@"blur"];
     NSString *sblurZoom = call.arguments[@"blurZoom"];
+    NSString *fileSize = call.arguments[@"fileSize"];
 
     int mw = 0;
     int mh = 0;
@@ -59,7 +60,56 @@
                                 details:nil]);
     }
 
-  } else if ([@"encodeJpegWithBuffer" isEqualToString:call.method]) {
+  } else if ([@"encodeOneChip" isEqualToString:call.method]) {
+     NSString *srcPath = call.arguments[@"srcPath"];
+     NSString *targetPath = call.arguments[@"targetPath"];
+     NSString *squality = call.arguments[@"quality"];
+     NSString *smaxWidth = call.arguments[@"maxWidth"];
+     NSString *smaxHeight = call.arguments[@"maxHeight"];
+     NSString *srotate = call.arguments[@"rotate"];
+     NSString *sblur = call.arguments[@"blur"];
+     NSString *sblurZoom = call.arguments[@"blurZoom"];
+     NSString *fileSize = call.arguments[@"fileSize"];
+
+     int mw = 0;
+     int mh = 0;
+     int quality = 70;
+     int rotate = 0;
+     int blur = 0;
+     int blurZoom = 0;
+
+     @try{
+         quality = [squality intValue];
+         mw = [smaxWidth intValue];
+         mh = [smaxHeight intValue];
+         rotate = [srotate intValue];
+         blur = [sblur intValue];
+         blurZoom = [sblurZoom intValue];
+     } @catch(NSException *e){ }
+
+     if (targetPath == nil || targetPath == NULL || [targetPath isKindOfClass:[NSNull class]]) {
+         targetPath = [srcPath  stringByAppendingString: @".jpg"];
+     }
+
+     UIImage *image = [UIImage imageWithContentsOfFile:srcPath]; // init image
+     NSData *data = [self processImage:image
+                                    mw:mw
+                                    mh:mh
+                                rotate:rotate
+                                  blur:blur
+                              blurZoom:blurZoom
+                               quality:quality
+     ];
+
+     if ([[NSFileManager defaultManager] createFileAtPath:targetPath contents:data attributes:nil]) {
+         result(targetPath);
+     } else {
+         result([FlutterError errorWithCode:@"Encode Jpeg Failed"
+                                 message:@"Temporary file could not be created"
+                                 details:nil]);
+     }
+
+    } else if ([@"encodeJpegWithBuffer" isEqualToString:call.method]) {
     NSArray *args = call.arguments;
     FlutterStandardTypedData *list = args[0];
     int quality = [args[1] intValue];

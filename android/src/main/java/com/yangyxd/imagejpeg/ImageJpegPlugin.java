@@ -60,7 +60,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             int rotate = call.argument("rotate");
             int blur = call.argument("blur");
             int blurZoom = call.argument("blurZoom");
-
+            int fileSize = call.argument("fileSize");
             if (srcPath == null || srcPath.length() == 0) {
                 result.error("Filename not valid", null, null);
                 return;
@@ -74,7 +74,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             if (targetPath == null || targetPath.length() == 0)
                 targetPath = srcPath + ".jpg";
 
-            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, false);
+            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, false, fileSize);
             if (newPath == null || newPath.length() == 0)
                 result.error("Encode Jpeg Failed", null, null);
             else
@@ -90,7 +90,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             int rotate = call.argument("rotate");
             int blur = call.argument("blur");
             int blurZoom = call.argument("blurZoom");
-
+            int fileSize = call.argument("fileSize");
             if (srcPath == null || srcPath.length() == 0) {
                 result.error("Filename not valid", null, null);
                 return;
@@ -104,7 +104,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
             if (targetPath == null || targetPath.length() == 0)
                 targetPath = srcPath + ".jpg";
 
-            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, true);
+            String newPath = compressImage(srcPath, targetPath, quality, maxWidth, maxHeight, rotate, blur, blurZoom, true, fileSize);
 
             if (newPath == null || newPath.length() == 0)
                 result.error("Encode Jpeg Failed", null, null);
@@ -218,7 +218,7 @@ public class ImageJpegPlugin implements MethodCallHandler {
         }
     }
 
-    public String compressImage(String filePath, String targetPath, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom, boolean isOneChip) {
+    public String compressImage(String filePath, String targetPath, int quality, int maxWidth, int maxHeight, int rotate, int blur, int blurZoom, boolean isOneChip, int fileSize) {
         //Log.d("image_jpeg", String.format("srcfile: %s", filePath));
         //Log.d("image_jpeg", String.format("mw: %d, mh: %d, quality: %d, targetfile: %s", maxWidth, maxHeight, quality, targetPath));
         try {
@@ -237,11 +237,10 @@ public class ImageJpegPlugin implements MethodCallHandler {
                 return null;
             }
             FileOutputStream out = new FileOutputStream(outputFile);
-            if (isOneChip) {
-                bm = compressImage(bm);
-            }
+            //压缩后的图片大小限制
+            bm = compressImage(bm, fileSize);
             bm.compress(Bitmap.CompressFormat.JPEG, quality, out);
-            //Log.d("image_jpeg", String.format("targerSize: %d, outputfile: %s", out.getChannel().size(), outputFile.getPath()));
+            Log.d("image_jpeg", String.format("targerSize: %d, outputfile: %s", out.getChannel().size(), outputFile.getPath()));
             out.close();
             return outputFile.getPath();
         } catch (Exception e) {
@@ -256,13 +255,12 @@ public class ImageJpegPlugin implements MethodCallHandler {
      * @param image
      * @return
      */
-    public static Bitmap compressImage(Bitmap image) {
+    public static Bitmap compressImage(Bitmap image, int size) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // 质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         int options = 90;
-        // 循环判断如果压缩后图片是否大于25kb,大于继续压缩
-        while (baos.toByteArray().length / 1024 > 25) {
+        // 循环判断如果压缩后图片是否大于size的大小单位是kb,大于继续压缩
+        while (baos.toByteArray().length / 1024 > size) {
             // 重置baos即清空baos
             baos.reset();
             // 这里压缩options%，把压缩后的数据存放到baos中
