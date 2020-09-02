@@ -20,7 +20,7 @@
     NSString *srotate = call.arguments[@"rotate"];
     NSString *sblur = call.arguments[@"blur"];
     NSString *sblurZoom = call.arguments[@"blurZoom"];
-    NSString *fileSize = call.arguments[@"fileSize"];
+    NSString *sfileSize = call.arguments[@"fileSize"];
 
     int mw = 0;
     int mh = 0;
@@ -28,7 +28,7 @@
     int rotate = 0;
     int blur = 0;
     int blurZoom = 0;
-
+    int fileSize = 0;
     @try{
         quality = [squality intValue];
         mw = [smaxWidth intValue];
@@ -36,6 +36,7 @@
         rotate = [srotate intValue];
         blur = [sblur intValue];
         blurZoom = [sblurZoom intValue];
+        fileSize = [sfileSize intValue];
     } @catch(NSException *e){ }
 
     if (targetPath == nil || targetPath == NULL || [targetPath isKindOfClass:[NSNull class]]) {
@@ -69,7 +70,7 @@
      NSString *srotate = call.arguments[@"rotate"];
      NSString *sblur = call.arguments[@"blur"];
      NSString *sblurZoom = call.arguments[@"blurZoom"];
-     NSString *fileSize = call.arguments[@"fileSize"];
+     NSString *sfileSize = call.arguments[@"fileSize"];
 
      int mw = 0;
      int mh = 0;
@@ -77,7 +78,7 @@
      int rotate = 0;
      int blur = 0;
      int blurZoom = 0;
-
+    int filseSize = 0;
      @try{
          quality = [squality intValue];
          mw = [smaxWidth intValue];
@@ -85,6 +86,7 @@
          rotate = [srotate intValue];
          blur = [sblur intValue];
          blurZoom = [sblurZoom intValue];
+         filseSize = [sfileSize intValue];
      } @catch(NSException *e){ }
 
      if (targetPath == nil || targetPath == NULL || [targetPath isKindOfClass:[NSNull class]]) {

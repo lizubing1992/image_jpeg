@@ -1,18 +1,13 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:image_jpeg/image_jpeg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:zoomable_image/zoomable_image.dart';
-import 'dart:io';
-
 
 void main() => runApp(new MaterialApp(
-  home: MyApp(),
-));
+      home: MyApp(),
+    ));
 
 class MyApp extends StatefulWidget {
   @override
@@ -35,8 +30,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var image = imgbuffer != null && !imgbuffer.isEmpty ? MemoryImage(imgbuffer) :
-      _newfile == null ? null : FileImageEx(File(_newfile));
+    var image = imgbuffer != null && !imgbuffer.isEmpty
+        ? MemoryImage(imgbuffer)
+        : _newfile == null ? null : FileImageEx(File(_newfile));
 
     return new MaterialApp(
       home: new Scaffold(
@@ -51,21 +47,27 @@ class _MyAppState extends State<MyApp> {
               Row(
                 children: <Widget>[
                   SizedBox(width: 16.0),
-                  RaisedButton(onPressed: () {
-                    _selectImage();
-                  }, child: Text('压缩图片')),
-                  Checkbox(value: _roate, onChanged: (v) {
-                   setState(() {
-                     _roate = v;
-                   });
-                  }),
+                  RaisedButton(
+                      onPressed: () {
+                        _selectImage();
+                      },
+                      child: Text('压缩图片')),
+                  Checkbox(
+                      value: _roate,
+                      onChanged: (v) {
+                        setState(() {
+                          _roate = v;
+                        });
+                      }),
                   Text('旋转'),
                   SizedBox(width: 8.0),
-                  Checkbox(value: _blur, onChanged: (v) {
-                    setState(() {
-                      _blur = v;
-                    });
-                  }),
+                  Checkbox(
+                      value: _blur,
+                      onChanged: (v) {
+                        setState(() {
+                          _blur = v;
+                        });
+                      }),
                   Text('高斯模糊'),
                 ],
               ),
@@ -75,15 +77,21 @@ class _MyAppState extends State<MyApp> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      RaisedButton(onPressed: () {
-                        _blurImage();
-                      }, child: Text('模糊图片')),
-                      RaisedButton(onPressed: () {
-                        _encodeResImage();
-                      }, child: Text('资源图片')),
-                      RaisedButton(onPressed: () {
-                        _loadResImage();
-                      }, child: Text('加载资源')),
+                      RaisedButton(
+                          onPressed: () {
+                            _blurImage();
+                          },
+                          child: Text('模糊图片')),
+                      RaisedButton(
+                          onPressed: () {
+                            _encodeResImage();
+                          },
+                          child: Text('资源图片')),
+                      RaisedButton(
+                          onPressed: () {
+                            _loadResImage();
+                          },
+                          child: Text('加载资源')),
                     ],
                   ),
                   SizedBox(width: 8.0),
@@ -105,14 +113,14 @@ class _MyAppState extends State<MyApp> {
                           });
                         },
                       ),
-                      Text("$_hintMsg", style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 11.0,
-                          fontWeight: FontWeight.w300,
-                          shadows: [
-                            Shadow(blurRadius: 4.0),
-                          ]
-                      ))
+                      Text("$_hintMsg",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 11.0,
+                              fontWeight: FontWeight.w300,
+                              shadows: [
+                                Shadow(blurRadius: 4.0),
+                              ]))
                     ],
                   ),
                   SizedBox(width: 4.0),
@@ -127,14 +135,15 @@ class _MyAppState extends State<MyApp> {
                     child: image == null ? null : Image(image: image),
                     decoration: BoxDecoration(
                         border: Border.all(
-                          color: Colors.black12,
-                          width: 0.5,
-                        )
-                    ),
+                      color: Colors.black12,
+                      width: 0.5,
+                    )),
                   ),
-                  onTap: imgbuffer == null && _newfile == null ? null : () {
-                    _openNewPage(image);
-                  },
+                  onTap: imgbuffer == null && _newfile == null
+                      ? null
+                      : () {
+                          _openNewPage(image);
+                        },
                 ),
               )
             ],
@@ -147,17 +156,29 @@ class _MyAppState extends State<MyApp> {
   void _openNewPage(ImageProvider image) {
     Navigator.push(context, MaterialPageRoute(
       builder: (context) {
-          return new Scaffold(
-            body: ZoomableImage(
-                image,
-                placeholder: const Center(child: const CircularProgressIndicator()),
-                backgroundColor: Colors.black,
-                onTap: () {
-                  Navigator.pop(context);
-                },
-            ),
-          );
-        },
+        return Scaffold(
+          body: Container(
+              width: 259,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: image,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Text("data")
+
+//            Container(
+//              dec
+//                image,
+//                placeholder: const Center(child: const CircularProgressIndicator()),
+//                backgroundColor: Colors.black,
+//                onTap: () {
+//                  Navigator.pop(context);
+//                },
+//            ),
+              ),
+        );
+      },
     ));
   }
 
@@ -179,8 +200,15 @@ class _MyAppState extends State<MyApp> {
 
     print("srcfile: " + imageFile.path);
     var t = new DateTime.now().millisecondsSinceEpoch;
-    String newfile = await ImageJpeg.encodeJpeg(imageFile.path, null, 65, 1360, 1360, _roate ? 90 : 0,
-        _blur ? (blurValue * 100).toInt() : 0, (blurZomm * 10).toInt());
+    String newfile = await ImageJpeg.encodeJpeg(
+        imageFile.path,
+        null,
+        65,
+        1000,
+        1000,
+        _roate ? 90 : 0,
+        _blur ? (blurValue * 100).toInt() : 0,
+        (blurZomm * 10).toInt());
     var t2 = new DateTime.now().millisecondsSinceEpoch;
     if (newfile == null || newfile.isEmpty) {
       updateMsg("无效的图像文件");
@@ -191,7 +219,8 @@ class _MyAppState extends State<MyApp> {
       var nv = await ImageJpeg.getInfo(newfile);
       if (sv != null) {
         updateMsg("newfile: " + newfile);
-        updateMsg("用时: ${t2 - t}ms \n原文件: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n新文件: ${getRollupSize(nv.size)}, ${nv.width}*${nv.height} \n压缩率: ${(nv.size / sv.size * 100).toStringAsFixed(2)}%");
+        updateMsg(
+            "用时: ${t2 - t}ms \n原文件: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n新文件: ${getRollupSize(nv.size)}, ${nv.width}*${nv.height} \n压缩率: ${(nv.size / sv.size * 100).toStringAsFixed(2)}%");
       } else
         updateMsg("获取文件信息失败");
       //f.delete();
@@ -202,7 +231,8 @@ class _MyAppState extends State<MyApp> {
     File imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     print("srcfile: " + imageFile.path);
     var t = new DateTime.now().millisecondsSinceEpoch;
-    List<int> data = await ImageJpeg.blurImageWithFlie(imageFile.path, (blurValue * 100).toInt(), (blurZomm * 10).toInt(), _roate ? 100 : 0);
+    List<int> data = await ImageJpeg.blurImageWithFlie(imageFile.path,
+        (blurValue * 100).toInt(), (blurZomm * 10).toInt(), _roate ? 100 : 0);
     var t2 = new DateTime.now().millisecondsSinceEpoch;
     if (data == null || data.isEmpty) {
       updateMsg("无效的图像文件");
@@ -211,29 +241,38 @@ class _MyAppState extends State<MyApp> {
       imgbuffer = ImageJpeg.convertToUint8List(data);
       var sv = await ImageJpeg.getInfo(imageFile.path);
       if (sv != null)
-        updateMsg("用时: ${t2 - t}ms \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
+        updateMsg(
+            "用时: ${t2 - t}ms \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
       else
         updateMsg("获取文件信息失败");
     }
   }
 
   _encodeResImage() async {
-      var t = new DateTime.now().millisecondsSinceEpoch;
-      var resName = Platform.isIOS ? "test.jpg" : "test";
-      List<int> data = await ImageJpeg.encodeImageWithRes(resName, 70, 'drawable', 1000, 1000, _roate ? 90 : 0,
-          _blur ? (blurValue * 100).toInt() : 0, (blurZomm * 10).toInt());
-      var t2 = new DateTime.now().millisecondsSinceEpoch;
-      if (data == null || data.isEmpty) {
-        updateMsg("无效的图像文件");
-      } else {
-        _deleteLastFile(null);
-        imgbuffer = ImageJpeg.convertToUint8List(data);
-        var sv = await ImageJpeg.getResImageInfo(resName, "drawable");
-        if (sv != null)
-          updateMsg("用时: ${t2 - t}ms \n资源ID: ${sv.resId} \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
-        else
-          updateMsg("获取文件信息失败");
-      }
+    var t = new DateTime.now().millisecondsSinceEpoch;
+    var resName = Platform.isIOS ? "test.jpg" : "test";
+    List<int> data = await ImageJpeg.encodeImageWithRes(
+        resName,
+        70,
+        'drawable',
+        1000,
+        1000,
+        _roate ? 90 : 0,
+        _blur ? (blurValue * 100).toInt() : 0,
+        (blurZomm * 10).toInt());
+    var t2 = new DateTime.now().millisecondsSinceEpoch;
+    if (data == null || data.isEmpty) {
+      updateMsg("无效的图像文件");
+    } else {
+      _deleteLastFile(null);
+      imgbuffer = ImageJpeg.convertToUint8List(data);
+      var sv = await ImageJpeg.getResImageInfo(resName, "drawable");
+      if (sv != null)
+        updateMsg(
+            "用时: ${t2 - t}ms \n资源ID: ${sv.resId} \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
+      else
+        updateMsg("获取文件信息失败");
+    }
   }
 
   _loadResImage() async {
@@ -248,7 +287,8 @@ class _MyAppState extends State<MyApp> {
       imgbuffer = ImageJpeg.convertToUint8List(data);
       var sv = await ImageJpeg.getResImageInfo(resName);
       if (sv != null)
-        updateMsg("用时: ${t2 - t}ms \n资源ID: ${sv.resId} \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
+        updateMsg(
+            "用时: ${t2 - t}ms \n资源ID: ${sv.resId} \n图像大小: ${getRollupSize(sv.size)}, ${sv.width}*${sv.height} \n输出大小: ${getRollupSize(data == null ? 0 : data.length)}");
       else
         updateMsg("获取文件信息失败");
     }
@@ -262,6 +302,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   static const RollupSize_Units = ["GB", "MB", "KB", "B"];
+
   /// 返回文件大小字符串
   static String getRollupSize(int size) {
     int idx = 3;
@@ -290,20 +331,20 @@ class _MyAppState extends State<MyApp> {
 
 class FileImageEx extends FileImage {
   int fileSize = 0;
-  FileImageEx(File file, { double scale = 1.0 })
+
+  FileImageEx(File file, {double scale = 1.0})
       : assert(file != null),
         assert(scale != null),
         super(file, scale: scale) {
-    if (file.existsSync())
-      fileSize = file.lengthSync();
+    if (file.existsSync()) fileSize = file.lengthSync();
   }
 
   @override
   bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType)
-      return false;
+    if (other.runtimeType != runtimeType) return false;
     final FileImageEx typedOther = other;
-    return file?.path == typedOther.file?.path
-        && scale == typedOther.scale && fileSize == typedOther.fileSize;
+    return file?.path == typedOther.file?.path &&
+        scale == typedOther.scale &&
+        fileSize == typedOther.fileSize;
   }
 }
