@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_jpeg/image_jpeg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(new MaterialApp(
       home: MyApp(),
@@ -200,9 +201,11 @@ class _MyAppState extends State<MyApp> {
 
     print("srcfile: " + imageFile.path);
     var t = new DateTime.now().millisecondsSinceEpoch;
+    Directory tempDir = await getTemporaryDirectory();
+    String targetPath = "${tempDir.path}_$t";
     String newfile = await ImageJpeg.encodeJpeg(
         imageFile.path,
-        null,
+        targetPath,
         65,
         1000,
         1000,
